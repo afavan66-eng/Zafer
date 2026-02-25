@@ -5,148 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AzeChecker | API Panel</title>
     <style>
-        :root {
-            --primary: #2563eb;
-            --dark: #0f172a;
-            --light: #f1f5f9;
-            --card-bg: #ffffff;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            margin: 0;
-            background-color: var(--light);
-            color: var(--dark);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* Hamburger Menü */
-        .sidebar {
-            position: fixed;
-            left: -280px;
-            top: 0;
-            width: 280px;
-            height: 100%;
-            background: var(--dark);
-            color: white;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1000;
-            padding-top: 70px;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.2);
-        }
-
+        :root { --primary: #2563eb; --dark: #0f172a; --light: #f1f5f9; --card-bg: #ffffff; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--light); color: var(--dark); }
+        .sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background: var(--dark); color: white; transition: 0.4s; z-index: 1000; padding-top: 70px; }
         .sidebar.active { left: 0; }
-
-        .sidebar a {
-            padding: 15px 25px;
-            text-decoration: none;
-            color: #94a3b8;
-            display: block;
-            border-left: 4px solid transparent;
-            transition: 0.3s;
-            font-weight: 500;
-        }
-
-        .sidebar a:hover, .sidebar a.active-link {
-            background: #1e293b;
-            color: white;
-            border-left: 4px solid var(--primary);
-        }
-
-        .menu-btn {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 1001;
-            background: var(--primary);
-            color: white;
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Ana İçerik */
-        .main-content {
-            padding: 90px 20px 30px;
-            max-width: 600px;
-            margin: 0 auto;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .card {
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-        }
-
-        h2 { margin-bottom: 20px; font-size: 1.5rem; text-align: center; }
-
+        .sidebar a { padding: 15px 25px; text-decoration: none; color: #94a3b8; display: block; border-left: 4px solid transparent; }
+        .sidebar a:hover { background: #1e293b; color: white; border-left: 4px solid var(--primary); }
+        .menu-btn { position: fixed; top: 15px; left: 15px; z-index: 1001; background: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 10px; cursor: pointer; font-size: 24px; }
+        .main-content { padding: 90px 20px 30px; max-width: 600px; margin: 0 auto; }
+        .card { background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .input-group { margin-bottom: 15px; }
-        
         label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 600; color: #64748b; }
-
-        input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-size: 16px;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input:focus { border-color: var(--primary); }
-
-        .send-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 10px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 10px;
-            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
-        }
-
-        /* Sonuç Paneli */
-        #result-container {
-            margin-top: 25px;
-            background: #1e293b;
-            border-radius: 10px;
-            padding: 15px;
-            display: none;
-        }
-
-        #result {
-            color: #10b981;
-            white-space: pre-wrap;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            overflow-x: auto;
-        }
-
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-            backdrop-filter: blur(2px);
-        }
+        input { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; }
+        .send-btn { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 10px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; margin-top: 10px; }
+        #result-container { margin-top: 25px; background: #1e293b; border-radius: 10px; padding: 15px; display: none; overflow: hidden; }
+        #result { color: #4ade80; white-space: pre-wrap; font-family: monospace; font-size: 13px; word-break: break-all; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
         .overlay.active { display: block; }
     </style>
 </head>
@@ -166,29 +40,25 @@
 
     <div class="main-content">
         <div class="card">
-            <h2 id="panel-title">Ad Soyad Sorgu</h2>
-            
-            <div id="dynamic-inputs">
-                </div>
-
+            <h2 id="panel-title" style="text-align:center">Ad Soyad Sorgu</h2>
+            <div id="dynamic-inputs"></div>
             <button class="send-btn" onclick="sendQuery()">Sorgula</button>
-            
-            <div id="result-container">
-                <div id="result"></div>
-            </div>
+            <div id="result-container"><div id="result"></div></div>
         </div>
     </div>
 
     <script>
         let currentMode = 'adsoyad';
+        // Proxy sunucusu (CORS hatasını aşmak için)
+        const proxy = "https://api.allorigins.win/get?url=";
 
         const config = {
-            adsoyad: { title: "Ad Soyad Sorgu", fields: ["Ad", "Soyad", "İl", "İlçe"], url: "https://azechecker.xyz/apiler/adsoyad.php" },
-            tc: { title: "TC Sorgu", fields: ["TC"], url: "https://azechecker.xyz/apiler/tc.php" },
-            aile: { title: "Aile Sorgu", fields: ["TC"], url: "https://azechecker.xyz/apiler/aile.php" },
-            sulale: { title: "Sülale Sorgu", fields: ["TC"], url: "https://azechecker.xyz/apiler/sulale.php" },
-            gsmtc: { title: "GSM'den TC Sorgu", fields: ["GSM"], url: "https://azechecker.xyz/apiler/gsmtc.php" },
-            tcgsm: { title: "TC'den GSM Sorgu", fields: ["TC"], url: "https://azechecker.xyz/apiler/tcgsm.php" }
+            adsoyad: { title: "Ad Soyad Sorgu", fields: ["ad", "soyad", "il", "ilce"], url: "https://azechecker.xyz/apiler/adsoyad.php" },
+            tc: { title: "TC Sorgu", fields: ["tc"], url: "https://azechecker.xyz/apiler/tc.php" },
+            aile: { title: "Aile Sorgu", fields: ["tc"], url: "https://azechecker.xyz/apiler/aile.php" },
+            sulale: { title: "Sülale Sorgu", fields: ["tc"], url: "https://azechecker.xyz/apiler/sulale.php" },
+            gsmtc: { title: "GSM'den TC", fields: ["gsm"], url: "https://azechecker.xyz/apiler/gsmtc.php" },
+            tcgsm: { title: "TC'den GSM", fields: ["tc"], url: "https://azechecker.xyz/apiler/tcgsm.php" }
         };
 
         function toggleMenu() {
@@ -202,52 +72,36 @@
             document.getElementById('panel-title').innerText = settings.title;
             const container = document.getElementById('dynamic-inputs');
             container.innerHTML = '';
-
-            settings.fields.forEach(field => {
-                container.innerHTML += `
-                    <div class="input-group">
-                        <label>${field}</label>
-                        <input type="text" id="input-${field.toLowerCase()}" placeholder="${field} giriniz...">
-                    </div>
-                `;
+            settings.fields.forEach(f => {
+                container.innerHTML += `<div class="input-group"><label>${f.toUpperCase()}</label><input type="text" id="in-${f}" placeholder="${f} girin..."></div>`;
             });
-
             document.getElementById('result-container').style.display = 'none';
-            toggleMenu();
+            if(window.innerWidth < 768) toggleMenu();
         }
 
         async function sendQuery() {
             const settings = config[currentMode];
-            const resultDiv = document.getElementById('result');
-            const resultContainer = document.getElementById('result-container');
+            const resDiv = document.getElementById('result');
+            const resCont = document.getElementById('result-container');
             
-            // Parametreleri topla
             let params = new URLSearchParams();
-            settings.fields.forEach(field => {
-                const val = document.getElementById(`input-${field.toLowerCase()}`).value;
-                params.append(field.toLowerCase(), val);
-            });
+            settings.fields.forEach(f => params.append(f, document.getElementById(`in-${f}`).value));
 
-            resultContainer.style.display = 'block';
-            resultDiv.innerText = "Sorgulanıyor... Lütfen bekleyin.";
+            resCont.style.display = 'block';
+            resDiv.innerText = "Sorgulanıyor...";
 
             try {
-                const response = await fetch(`${settings.url}?${params.toString()}`);
-                const data = await response.text(); // JSON değilse .text() kullanıyoruz
+                // API URL'sini Proxy üzerinden çağırıyoruz
+                const finalUrl = `${settings.url}?${params.toString()}`;
+                const response = await fetch(proxy + encodeURIComponent(finalUrl));
+                const data = await response.json();
                 
-                // Eğer API JSON dönüyorsa güzelleştirelim
-                try {
-                    const jsonData = JSON.parse(data);
-                    resultDiv.innerText = JSON.stringify(jsonData, null, 2);
-                } catch {
-                    resultDiv.innerText = data;
-                }
+                // Proxy'den gelen veriyi işle
+                resDiv.innerText = data.contents || "Veri bulunamadı.";
             } catch (error) {
-                resultDiv.innerText = "Bağlantı Hatası: " + error.message;
+                resDiv.innerText = "Hata oluştu! API sunucusu yanıt vermiyor olabilir.";
             }
         }
-
-        // İlk açılışta Ad Soyad modunu yükle
         window.onload = () => setMode('adsoyad');
     </script>
 </body>
